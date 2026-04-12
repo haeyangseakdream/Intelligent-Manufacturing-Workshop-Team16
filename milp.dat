@@ -1,0 +1,84 @@
+set ENGINEERS := engineer_1 engineer_2 engineer_3 engineer_4 engineer_5 engineer_6 engineer_7 
+                 engineer_8 engineer_9 engineer_10 engineer_11 engineer_12 engineer_13 engineer_14 engineer_15;
+
+param DefaultShift :=
+engineer_1 D  engineer_2 D  engineer_3 D  engineer_4 D  engineer_5 D
+engineer_6 D  engineer_7 D  engineer_8 E  engineer_9 E  engineer_10 E
+engineer_11 E engineer_12 E engineer_13 N engineer_14 N engineer_15 N;
+
+param IsWeekend := 
+1 1 
+2 1 
+3 0
+4 0
+5 0
+6 0
+7 0
+8 1 
+9 1 
+10 0
+11 0
+12 0
+13 0
+14 0
+15 1
+16 1 
+17 0
+18 0
+19 0
+20 0
+21 0
+22 1 
+23 1 
+24 0
+25 0
+26 0
+27 0
+28 0
+29 1 
+30 1 
+;
+
+param Demand: D E N :=
+1 4 3 2  
+2 4 3 2  
+3 5 3 2  
+4 5 3 2  
+5 5 3 2
+6 5 3 2  
+7 5 3 2  
+8 4 3 2  
+9 4 3 2  
+10 5 3 2
+11 5 3 2  
+12 5 3 2  
+13 5 3 2  
+14 5 3 2  
+15 4 3 2
+16 4 3 2  
+17 5 3 2  
+18 5 3 2  
+19 5 3 2  
+20 5 3 2
+21 5 3 2
+22 4 3 2  
+23 4 3 2  
+24 5 3 2  
+25 5 3 2
+26 5 3 2  
+27 5 3 2  
+28 5 3 2  
+29 4 3 2  
+30 4 3 2
+;
+
+param PreAssign :=
+engineer_1 1 E  engineer_1 2 O
+engineer_2 1 O  
+engineer_3 1 O  
+engineer_4 2 D  
+engineer_5 3 D  
+engineer_10 2 E  
+engineer_13 2 O
+engineer_13 30 O    
+; 

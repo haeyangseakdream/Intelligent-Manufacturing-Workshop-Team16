@@ -1,0 +1,76 @@
+reset;
+# 1. 讀取模型與數據
+model milp.mod;
+data milp.dat;
+
+# 2. 設定求解器 
+option solver gurobi;
+
+option gurobi_options 'outlev=1 mipfocus=2 cuts=2  MIPGapAbs =0.1';
+
+#option relax_integrality 1;
+solve;
+printf "\n===== Solve Time =====\n";
+printf "Solve Time = %g seconds\n", _solve_elapsed_time;
+
+printf "ENGINEER,GROUP" > Scheduling_Output.csv;
+for {d in DAYS} {
+    printf ",Date_%d", d >> Scheduling_Output.csv;
+}
+printf "\n" >> Scheduling_Output.csv;
+
+# 4. 逐一寫入每位工程師的每日班別 (對應題目要求的藍框內容) 
+for {i in ENGINEERS} {
+    # 寫入工程師姓名與其預設班別群組 
+    printf "%s,%s", i, DefaultShift[i] >> Scheduling_Output.csv;
+    
+    # 遍歷 30 天，找出該日被指派的班別代號 
+    for {d in DAYS} {
+        for {s in SHIFTS} {
+            # 若決策變數為 1 (二進位變數)，則輸出該班別代號 D, E, N, 或 O 
+            if x[i,d,s] > 0.5 then {
+                printf ",%s", s >> Scheduling_Output.csv;
+            }
+        }
+    }
+    printf "\n" >> Scheduling_Output.csv;
+}
+
+printf "\n===== Penalty Breakdown =====\n";
+
+printf "1.0 * %g (連續上班6天)\n",
+    sum{i in ENGINEERS, d in 1..25} p_consec6[i,d];
+
+printf "1.0 * %g (班別銜接違反)\n",
+    sum{i in ENGINEERS, d in 1..29}
+        (p_night_next[i,d] + p_eve_day[i,d] + p_day_night[i,d]);
+
+printf "0.2 * %g (違反預設班別)\n",
+    sum{i in ENGINEERS, d in DAYS} p_diff_default[i,d];
+
+printf "0.1 * %g (月休不足)\n",
+    sum{i in ENGINEERS} shortfall_off[i];
+    
+
+printf "0.1 * %g (週末休假不足)\n",
+    sum{i in ENGINEERS} shortfall_weekend[i];
+
+printf "0.1 * %g (單日休假)\n",
+    sum{i in ENGINEERS, d in 2..29} p_single_off[i,d];
+
+printf "0.1 * %g (連續休假不足)\n",
+    sum{i in ENGINEERS} p_consec_low[i];
+
+printf "\nTotal Penalty = %g\n",
+      1.0 * sum{i in ENGINEERS, d in 1..25} p_consec6[i,d]
+    + 1.0 * sum{i in ENGINEERS, d in 1..29}
+        (p_night_next[i,d] + p_eve_day[i,d] + p_day_night[i,d])
+    + 0.2 * sum{i in ENGINEERS, d in DAYS} p_diff_default[i,d]
+    + 0.1 * sum{i in ENGINEERS} shortfall_off[i]
+    + 0.1 * sum{i in ENGINEERS} shortfall_weekend[i]
+    + 0.1 * sum{i in ENGINEERS, d in 2..29} p_single_off[i,d]
+    + 0.1 * sum{i in ENGINEERS} p_consec_low[i];
+
+printf "--------------------------------------------------\n";
+printf "排程計算完成！結果已填入藍框區域並匯出至 Scheduling_Output.csv \n";
+printf "--------------------------------------------------\n";
