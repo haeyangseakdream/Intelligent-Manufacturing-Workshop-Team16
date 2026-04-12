@@ -81,17 +81,8 @@ subject to TotalOffRule{i in ENGINEERS}:
 
 #周末休<4天 
 
-subject to WeekendOff_Step1{i in ENGINEERS}:
-    sum{d in DAYS: IsWeekend[d] == 1} x[i,d,'O'] <= 3 ==> shortfall_weekend[i] >= 1;
-
-subject to WeekendOff_Step2{i in ENGINEERS}:
-    sum{d in DAYS: IsWeekend[d] == 1} x[i,d,'O'] <= 2 ==> shortfall_weekend[i] >= 2;
-
-subject to WeekendOff_Step3{i in ENGINEERS}:
-    sum{d in DAYS: IsWeekend[d] == 1} x[i,d,'O'] <= 1 ==> shortfall_weekend[i] >= 3;
-
-subject to WeekendOff_Step4{i in ENGINEERS}:
-    sum{d in DAYS: IsWeekend[d] == 1} x[i,d,'O'] <= 0 ==> shortfall_weekend[i] >= 4;
+subject to WeekendOffRule{i in ENGINEERS}:
+    sum{d in DAYS: IsWeekend[d] == 1} x[i,d,'O'] + shortfall_weekend[i] >= 4;
 
     
 #單日休假
